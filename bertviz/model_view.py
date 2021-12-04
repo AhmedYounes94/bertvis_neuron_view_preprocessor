@@ -165,7 +165,7 @@ def model_view(
             <div id='vis'></div>
         </div>
     """%(vis_id)
-
+# they use loop because some times attentions are pointing to 2 sentences
     for d in attn_data:
         attn_seq_len_left = len(d['attn'][0][0])
         if attn_seq_len_left != len(d['left_text']):
