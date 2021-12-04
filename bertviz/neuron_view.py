@@ -34,7 +34,7 @@ import torch
 from IPython.core.display import display, HTML, Javascript
 
 
-def show(model, model_type, tokenizer, preprocessor, sentence_a, sentence_b=None, display_mode='dark', layer=None, head=None):
+def show(model, model_type, tokenizer, preprocess, sentence_a, sentence_b=None, display_mode='dark', layer=None, head=None):
 
     # Generate unique div id to enable multiple visualizations in one notebook
 
@@ -70,7 +70,7 @@ def show(model, model_type, tokenizer, preprocessor, sentence_a, sentence_b=None
     display(HTML(vis_html))
     __location__ = os.path.realpath(
         os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    attn_data = get_attention(model, model_type, tokenizer, preprocessor, sentence_a, sentence_b, include_queries_and_keys=True)
+    attn_data = get_attention(model, model_type, tokenizer, preprocess, sentence_a, sentence_b, include_queries_and_keys=True)
     if model_type == 'gpt2':
         bidirectional = False
     else:
@@ -88,7 +88,7 @@ def show(model, model_type, tokenizer, preprocessor, sentence_a, sentence_b=None
     display(Javascript(vis_js))
 
 
-def get_attention(model, model_type, tokenizer, preprocessor, sentence_a, sentence_b=None, include_queries_and_keys=False):
+def get_attention(model, model_type, tokenizer, preprocess, sentence_a, sentence_b=None, include_queries_and_keys=False):
     """Compute representation of attention to pass to the d3 visualization
 
     Args:
@@ -134,14 +134,14 @@ def get_attention(model, model_type, tokenizer, preprocessor, sentence_a, senten
     token_type_ids = None
     if not is_sentence_pair:  # Single sentence
         if model_type in ('bert', 'roberta'):
-            tokens_a = [tokenizer.cls_token] + tokenizer.tokenize(preprocessor.preprocess(sentence_a)) + [tokenizer.sep_token]
+            tokens_a = [tokenizer.cls_token] + tokenizer.tokenize(preprocess(sentence_a)) + [tokenizer.sep_token]
         elif model_type == 'xlnet':
             tokens_a = tokenizer.tokenize(sentence_a) + [tokenizer.sep_token] + [tokenizer.cls_token]
         else:
-            tokens_a = tokenizer.tokenize(preprocessor.preprocess(sentence_a))
+            tokens_a = tokenizer.tokenize(preprocess(sentence_a))
     else:
         if model_type == 'bert':
-            tokens_a = [tokenizer.cls_token] + tokenizer.tokenize(preprocessor.preprocess(sentence_a)) + [tokenizer.sep_token]
+            tokens_a = [tokenizer.cls_token] + tokenizer.tokenize(preprocess(sentence_a)) + [tokenizer.sep_token]
             tokens_b = tokenizer.tokenize(sentence_b) + [tokenizer.sep_token]
             token_type_ids = torch.LongTensor([[0] * len(tokens_a) + [1] * len(tokens_b)])
         elif model_type == 'roberta':
